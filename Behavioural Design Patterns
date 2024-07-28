@@ -1,0 +1,67 @@
+# Observer Pattern
+
+class WeatherData:
+    def __init__(self):
+        self._observers = []
+        self._temperature = 0
+
+    def register_observer(self, observer):
+        self._observers.append(observer)
+
+    def remove_observer(self, observer):
+        self._observers.remove(observer)
+
+    def notify_observers(self):
+        for observer in self._observers:
+            observer.update(self._temperature)
+
+    def set_temperature(self, temperature):
+        self._temperature = temperature
+        self.notify_observers()
+
+class Display:
+    def update(self, temperature):
+        raise NotImplementedError
+
+class MobileDisplay(Display):
+    def update(self, temperature):
+        print(f"Mobile Display: Current temperature is {temperature}°C")
+
+class WeatherStation:
+    def __init__(self):
+        self.weather_data = WeatherData()
+        self.mobile_display = MobileDisplay()
+
+    def run(self):
+        self.weather_data.register_observer(self.mobile_display)
+        self.weather_data.set_temperature(25)
+
+weather_station = WeatherStation()
+weather_station.run()
+
+# Strategy Pattern
+
+from abc import ABC, abstractmethod
+
+class PaymentStrategy(ABC):
+    @abstractmethod
+    def pay(self, amount):
+        pass
+
+class CreditCardPayment(PaymentStrategy):
+    def pay(self, amount):
+        print(f"Paying {amount} using Credit Card")
+
+class PayPalPayment(PaymentStrategy):
+    def pay(self, amount):
+        print(f"Paying {amount} using PayPal")
+
+class ShoppingCart:
+    def __init__(self, payment_strategy):
+        self.payment_strategy = payment_strategy
+
+    def checkout(self, amount):
+        self.payment_strategy.pay(amount)
+
+cart = ShoppingCart(PayPalPayment())
+cart.checkout(100)
